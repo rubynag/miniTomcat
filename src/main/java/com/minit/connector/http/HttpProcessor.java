@@ -1,4 +1,4 @@
-package server;
+package com.minit.connector.http;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,7 +47,7 @@ public class HttpProcessor implements Runnable{
             keepAlive = true;
             while (keepAlive){
                 // create Request object and parse
-                HttpRequest request = new HttpRequest(input);
+                HttpRequestImpl request = new HttpRequestImpl(input);
                 request.parse(socket);
 
                 if (request.getSessionId() == null || request.getSessionId().equals("")) {
@@ -55,7 +55,7 @@ public class HttpProcessor implements Runnable{
                 }
 
                 // create Response object
-                HttpResponse response = new HttpResponse(output);
+                HttpResponseImpl response = new HttpResponseImpl(output);
                 response.setRequest(request);
                 request.setResponse(response);
 
@@ -87,7 +87,7 @@ public class HttpProcessor implements Runnable{
 
     }
 
-    private void finishResponse(HttpResponse response) {
+    private void finishResponse(HttpResponseImpl response) {
         response.finishResponse();
     }
 

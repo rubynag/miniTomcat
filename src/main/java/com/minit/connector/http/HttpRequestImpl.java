@@ -1,4 +1,6 @@
-package server;
+package com.minit.connector.http;
+
+import com.minit.session.StandardSessionFacade;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -12,7 +14,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HttpRequest implements HttpServletRequest {
+public class HttpRequestImpl implements HttpServletRequest {
     private InputStream input;
     private SocketInputStream sis;
     private String uri;
@@ -27,17 +29,17 @@ public class HttpRequest implements HttpServletRequest {
     String sessionId;
     Cookie[] cookies;
     HttpSession session;
-    SessionFacade sessionFacade;
+    StandardSessionFacade standardSessionFacade;
     HttpRequestLine requestLine = new HttpRequestLine();
 
-    private HttpResponse response;
+    private HttpResponseImpl response;
 
-    public HttpRequest(InputStream input) {
+    public HttpRequestImpl(InputStream input) {
         this.input = input;
         this.sis = new SocketInputStream(this.input, 2048);
     }
 
-    public void setResponse(HttpResponse response) {
+    public void setResponse(HttpResponseImpl response) {
         this.response = response;
     }
 
@@ -62,7 +64,7 @@ public class HttpRequest implements HttpServletRequest {
 
     private void parseRequestLine() {
         int question = requestLine.indexOf("?");
-        String tmp =";"+DefaultHeaders.JSESSIONID_NAME+"=";
+        String tmp =";"+ DefaultHeaders.JSESSIONID_NAME+"=";
         if (question >= 0) {
             queryString = new String(requestLine.uri, question + 1, requestLine.uriEnd - question - 1);
             uri = new String(requestLine.uri, 0, question);
@@ -589,28 +591,28 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        return this.sessionFacade;
+        return this.standardSessionFacade;
     }
 
     @Override
     public HttpSession getSession(boolean arg0) {
-        if (sessionFacade != null)
-            return sessionFacade;
+        if (standardSessionFacade != null)
+            return standardSessionFacade;
         if(sessionId != null){
             session = HttpConnector.sessions.get(arg0);
             if (session != null) {
-                sessionFacade = new SessionFacade(session);
-                return sessionFacade;
+                standardSessionFacade = new StandardSessionFacade(session);
+                return standardSessionFacade;
             } else {
                 session = HttpConnector.createSession();
-                sessionFacade = new SessionFacade(session);
-                return sessionFacade;
+                standardSessionFacade = new StandardSessionFacade(session);
+                return standardSessionFacade;
             }
         }else {
             session = HttpConnector.createSession();
-            sessionFacade = new SessionFacade(session);
+            standardSessionFacade = new StandardSessionFacade(session);
             sessionId = session.getId();
-            return sessionFacade;
+            return standardSessionFacade;
         }
     }
 

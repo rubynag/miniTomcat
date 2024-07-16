@@ -1,4 +1,6 @@
-package server;
+package com.minit;
+
+import com.minit.connector.http.HttpRequestImpl;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -9,7 +11,7 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 public class Response implements ServletResponse{
-    HttpRequest request;
+    HttpRequestImpl request;
     OutputStream output;
     PrintWriter writer;
 
@@ -23,7 +25,7 @@ public class Response implements ServletResponse{
         this.output = output;
     }
 
-    public void setRequest(HttpRequest request) {
+    public void setRequest(HttpRequestImpl request) {
         this.request = request;
     }
 

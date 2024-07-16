@@ -1,4 +1,7 @@
-package server;
+package com.minit.connector.http;
+
+import com.minit.connector.http.HttpHeader;
+import com.minit.connector.http.HttpRequestLine;
 
 import java.io.IOException;
 import java.io.InputStream;
