@@ -1,7 +1,7 @@
 package com.minit.connector.http;
 
+import com.minit.*;
 import com.minit.core.StandardContext;
-import com.minit.Session;
 import com.minit.session.StandardSession;
 
 import javax.servlet.http.HttpSession;
@@ -13,15 +13,18 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HttpConnector implements Runnable {
+public class HttpConnector implements Connector, Runnable {
+
+    private String info = "com.minit.connector.http.HttpConnector/0.1";
+    private int port = 8080;
     int minProcessors = 3;
     int maxProcessors = 10;
     int curProcessors = 0;
     Deque<HttpProcessor> processors = new ArrayDeque<>();
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-    StandardContext container = null;
-
+    Container container = null;
+    private String threadName = null;
 
 
     public void run() {
@@ -63,17 +66,40 @@ public class HttpConnector implements Runnable {
     }
 
     public void start() {
+        threadName = "HttpConnector[" + port + "]";
+        log("httpConnector.starting " + threadName);
         Thread thread = new Thread(this);
         thread.start();
     }
 
-    public StandardContext getContainer() {
+    private void log(String message) {
+        Logger logger = container.getLogger();
+        String localName = threadName;
+        if (localName == null) localName = "HttpConnector";
+        if (logger != null) logger.log(localName + " " + message);
+        else System.out.println(localName + " " + message);
+    }
+
+    private void log(String message, Throwable throwable) {
+        Logger logger = container.getLogger();
+        String localName = threadName;
+        if (localName == null) localName = "HttpConnector";
+        if (logger != null) logger.log(localName + " " + message, throwable);
+        else {
+            System.out.println(localName + " " + message);
+            throwable.printStackTrace(System.out);
+        }
+    }
+
+    public Container getContainer() {
         return container;
     }
 
-    public void setContainer(StandardContext container) {
+
+    public void setContainer(Container container) {
         this.container = container;
     }
+
 
     private HttpProcessor createProcessor() {
         synchronized (processors) {
@@ -82,8 +108,7 @@ public class HttpConnector implements Runnable {
             }
             if (curProcessors < maxProcessors) {
                 return (newProcessor());
-            }
-            else {
+            } else {
                 return (null);
             }
         }
@@ -134,5 +159,34 @@ public class HttpConnector implements Runnable {
                 result.append((char) ('A' + (b2 - 10)));
         }
         return (result.toString());
+    }
+    @Override
+    public String getInfo() {
+        return this.info;
+    }
+
+    @Override
+    public String getScheme() {
+        return null;
+    }
+
+    @Override
+    public void setScheme(String scheme) {
+
+    }
+
+    @Override
+    public Request createRequest() {
+        return null;
+    }
+
+    @Override
+    public Response createResponse() {
+        return null;
+    }
+
+    @Override
+    public void initialize() {
+
     }
 }

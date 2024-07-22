@@ -1,6 +1,8 @@
 package com.minit.core;
 
 import com.minit.Container;
+import com.minit.Request;
+import com.minit.Response;
 import com.minit.Wrapper;
 
 import javax.servlet.Servlet;
@@ -16,6 +18,9 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
     private String servletClass;
 
     public StandardWrapper(String servletClass, StandardContext parent) {
+        super();
+        pipeline.setBasic(new StandardContextValve());
+
         this.servletClass = servletClass;
         this.parent = parent;
         try{
@@ -71,11 +76,11 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
         instance =servlet;
         return servlet;
     }
-    public void invoke(HttpServletRequest request, HttpServletResponse response)
+    public void invoke(Request request, Response response)
             throws IOException, ServletException {
-        if (instance != null) {
-            instance.service(request, response);
-        }
+        System.out.println("StandardWrapper invoke()");
+
+        super.invoke(request, response);
     }
     @Override
     public int getLoadOnStartup() {

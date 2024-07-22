@@ -1,8 +1,6 @@
 package com.minit.core;
 
-import com.minit.Container;
-import com.minit.Context;
-import com.minit.Wrapper;
+import com.minit.*;
 import com.minit.connector.HttpRequestFacade;
 import com.minit.connector.HttpResponseFacade;
 import com.minit.connector.http.HttpConnector;
@@ -27,6 +25,9 @@ public class StandardContext extends ContainerBase implements Context {
     Map<String, StandardWrapper> servletInstanceMap = new ConcurrentHashMap<>();
 
     public StandardContext() {
+        super();
+        pipeline.setBasic(new StandardContextValve());
+
         try {
             URL[] urls = new URL[1];
             URLStreamHandler streamHandler = null;
@@ -37,6 +38,7 @@ public class StandardContext extends ContainerBase implements Context {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+        log("Container created.");
     }
 
     public String getInfo() {
@@ -58,30 +60,10 @@ public class StandardContext extends ContainerBase implements Context {
 
 
     @Override
-    public void invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        StandardWrapper standardWrapper = null;
-        String uri = ((HttpRequestImpl)request).getUri();
-        String servletName = uri.substring(uri.lastIndexOf("/") + 1);
-        String servletClassName = servletName;
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        System.out.println("StandardContext invoke()");
 
-        standardWrapper = servletInstanceMap.get(servletName);
-        if (standardWrapper == null) {
-            standardWrapper = new StandardWrapper(servletClassName, this);
-            servletClsMap.put(servletName, servletClassName);
-            servletInstanceMap.put(servletName, standardWrapper); //按照规范，创建新实例的时候需要调用init()
-        }
-        try {
-            HttpServletRequest requestFacade = new HttpRequestFacade(request);
-            HttpServletResponse responseFacade = new HttpResponseFacade(response);
-            System.out.println("Call service()");
-
-            standardWrapper.invoke(requestFacade, responseFacade);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        } catch (Throwable e) {
-            System.out.println(e.toString());
-        }
-
+        super.invoke(request, response);
     }
 
     @Override
@@ -133,6 +115,16 @@ public class StandardContext extends ContainerBase implements Context {
     public String getWrapperClass() {
         return null;
     }
+    public Wrapper getWrapper(String name) {
+        StandardWrapper servletWrapper = servletInstanceMap.get(name);
+        if (servletWrapper == null) {
+            String servletClassName = name;
+            servletWrapper = new StandardWrapper(servletClassName, this);
+            this.servletClsMap.put(name, servletClassName);
+            this.servletInstanceMap.put(name, servletWrapper);
+        }
+        return servletWrapper;
+    }
 
     @Override
     public void setWrapperClass(String wrapperClass) {
@@ -158,4 +150,5 @@ public class StandardContext extends ContainerBase implements Context {
     public void reload() {
 
     }
+
 }

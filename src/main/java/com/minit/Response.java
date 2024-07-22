@@ -10,100 +10,27 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-public class Response implements ServletResponse{
-    HttpRequestImpl request;
-    OutputStream output;
-    PrintWriter writer;
-
-    String contentType = null;
-    long contentLength = -1;
-    String charset = null;
-    String characterEncoding = null;
-
-
-    public Response(OutputStream output) {
-        this.output = output;
-    }
-
-    public void setRequest(HttpRequestImpl request) {
-        this.request = request;
-    }
-
-    public OutputStream getOutput() {
-        return this.output;
-    }
-
-    @Override
-    public void flushBuffer() throws IOException {
-    }
-
-    @Override
-    public int getBufferSize() {
-        return 0;
-    }
-
-    @Override
-    public String getCharacterEncoding() {
-        return this.characterEncoding;
-    }
-
-    @Override
-    public String getContentType() {
-        return null;
-    }
-
-    @Override
-    public Locale getLocale() {
-        return null;
-    }
-
-    @Override
-    public ServletOutputStream getOutputStream() throws IOException {
-        return null;
-    }
-
-    @Override
-    public PrintWriter getWriter() throws IOException {
-        writer = new PrintWriter(new OutputStreamWriter(output,getCharacterEncoding()), true);
-        return writer;
-    }
-
-    @Override
-    public boolean isCommitted() {
-        return false;
-    }
-
-    @Override
-    public void reset() {
-    }
-
-    @Override
-    public void resetBuffer() {
-    }
-
-    @Override
-    public void setBufferSize(int arg0) {
-    }
-
-    @Override
-    public void setCharacterEncoding(String arg0) {
-        this.characterEncoding = arg0;
-    }
-
-    @Override
-    public void setContentLength(int arg0) {
-    }
-
-    @Override
-    public void setContentLengthLong(long arg0) {
-    }
-
-    @Override
-    public void setContentType(String arg0) {
-    }
-
-    @Override
-    public void setLocale(Locale arg0) {
-    }
+public interface Response {
+    public Connector getConnector();
+    public void setConnector(Connector connector);
+    public int getContentCount();
+    public Context getContext();
+    public void setContext(Context context);
+    public String getInfo();
+    public Request getRequest();
+    public void setRequest(Request request);
+    public ServletResponse getResponse();
+    public OutputStream getStream();
+    public void setStream(OutputStream stream);
+    public void setError();
+    public boolean isError();
+    public ServletOutputStream createOutputStream() throws IOException;
+    public void finishResponse() throws IOException;
+    public int getContentLength();
+    public String getContentType();
+    public PrintWriter getReporter();
+    public void recycle();
+    public void resetBuffer();
+    public void sendAcknowledgement() throws IOException;
 
 }
