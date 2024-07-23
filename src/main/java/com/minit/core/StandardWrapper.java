@@ -19,7 +19,7 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
 
     public StandardWrapper(String servletClass, StandardContext parent) {
         super();
-        pipeline.setBasic(new StandardContextValve());
+        pipeline.setBasic(new StandardWrapperValve());
 
         this.servletClass = servletClass;
         this.parent = parent;
@@ -58,7 +58,7 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
                 classClass = classLoader.loadClass(actualClass);
             }
         } catch (ClassNotFoundException e) {
-            throw new ServletException("Servlet class not found");
+            throw new ServletException("Servlet class not found:"+actualClass);
         }
         try {
             servlet = (Servlet) classClass.newInstance();

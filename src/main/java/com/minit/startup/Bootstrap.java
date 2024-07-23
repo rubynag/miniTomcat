@@ -2,6 +2,8 @@ package com.minit.startup;
 
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
+import com.minit.core.FilterDef;
+import com.minit.core.FilterMap;
 import com.minit.core.StandardContext;
 import com.minit.logger.FileLogger;
 
@@ -17,11 +19,23 @@ public class Bootstrap {
             log(".... startup ....");
         }
         HttpConnector connector = new HttpConnector();
-        StandardContext standardContext = new StandardContext();
-        connector.setContainer(standardContext);
-        standardContext.setConnector(connector);
+        StandardContext container = new StandardContext();
+        connector.setContainer(container);
+        container.setConnector(connector);
         Logger logger = new FileLogger();
-        standardContext.setLogger(logger);
+        container.setLogger(logger);
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterName("TestFilter");
+        filterDef.setFilterClass("test.TestFilter");
+        container.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("TestFilter");
+        filterMap.setURLPattern("/*");
+        container.addFilterMap(filterMap);
+
+        container.filterStart();
         connector.start();
     }
 
