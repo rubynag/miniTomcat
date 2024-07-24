@@ -2,6 +2,7 @@ package com.minit.startup;
 
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
+import com.minit.core.ContainerListenerDef;
 import com.minit.core.FilterDef;
 import com.minit.core.FilterMap;
 import com.minit.core.StandardContext;
@@ -22,6 +23,7 @@ public class Bootstrap {
         StandardContext container = new StandardContext();
         connector.setContainer(container);
         container.setConnector(connector);
+
         Logger logger = new FileLogger();
         container.setLogger(logger);
 
@@ -36,6 +38,14 @@ public class Bootstrap {
         container.addFilterMap(filterMap);
 
         container.filterStart();
+
+        ContainerListenerDef listenerDef = new ContainerListenerDef();
+        listenerDef.setListenerName("TestListener");
+        listenerDef.setListenerClass("test.TestListener");
+        container.addListenerDef(listenerDef);
+        container.listerStart();
+
+        container.start();
         connector.start();
     }
 
