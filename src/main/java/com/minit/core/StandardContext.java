@@ -2,16 +2,11 @@ package com.minit.core;
 
 import com.minit.*;
 import com.minit.connector.http.HttpConnector;
-import com.minit.startup.Bootstrap;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -73,17 +68,6 @@ public class StandardContext extends ContainerBase implements Context {
     public StandardContext() {
         super();
         pipeline.setBasic(new StandardContextValve());
-
-        try {
-            URL[] urls = new URL[1];
-            URLStreamHandler streamHandler = null;
-            File classPath = new File(Bootstrap.WEB_ROOT);
-            String repository = (new URL("file", null, classPath.getCanonicalPath() + File.separator)).toString();
-            urls[0] = new URL(null, repository, streamHandler);
-            loader = new URLClassLoader(urls);
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        }
         log("Container created.");
     }
 
@@ -311,12 +295,12 @@ public class StandardContext extends ContainerBase implements Context {
                 ContainerListener listener = null;
                 try {
                     String listenerClass = listenerDef.getListenerClass();
-                    ClassLoader classLoader = null;
+                    WebappClassLoader classLoader = null;
                     classLoader = this.getLoader();
 
                     ClassLoader oldCtxClassLoader =
                             Thread.currentThread().getContextClassLoader();
-                    Class<?> clazz = classLoader.loadClass(listenerClass);
+                    Class<?> clazz = classLoader.getClassLoader().loadClass(listenerClass);
                     listener = (ContainerListener)clazz.newInstance();
                     addContainerListener(listener);
                 } catch (Throwable e) {

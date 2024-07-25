@@ -30,10 +30,22 @@ public class HttpRequestImpl implements HttpServletRequest, Request {
     String sessionId;
     Cookie[] cookies;
     HttpSession session;
+    String sessionid;
     StandardSessionFacade standardSessionFacade;
     HttpRequestLine requestLine = new HttpRequestLine();
+    String docbase;
 
     private HttpResponseImpl response;
+
+    public String getDocbase() {
+        return docbase;
+    }
+    public void setDocbase(String docbase) {
+        this.docbase = docbase;
+    }
+
+    public HttpRequestImpl() {
+    }
 
     public HttpRequestImpl(InputStream input) {
         this.input = input;
@@ -65,19 +77,36 @@ public class HttpRequestImpl implements HttpServletRequest, Request {
 
     private void parseRequestLine() {
         int question = requestLine.indexOf("?");
-        String tmp =";"+ DefaultHeaders.JSESSIONID_NAME+"=";
         if (question >= 0) {
             queryString = new String(requestLine.uri, question + 1, requestLine.uriEnd - question - 1);
             uri = new String(requestLine.uri, 0, question);
+            String tmp =";"+ DefaultHeaders.JSESSIONID_NAME+"=";
+            int semicolon = uri.indexOf(tmp);
+            if(semicolon>=0){
+                sessionid = uri.substring(semicolon+tmp.length());
+                uri = uri.substring(0, semicolon);
+            }
+            int contextslash = uri.indexOf("/",1);
+            if(contextslash != -1){
+                this.docbase = uri.substring(1,contextslash);
+                uri = uri.substring(contextslash);
+            }
         } else {
             queryString = null;
             uri = new String(requestLine.uri, 0, requestLine.uriEnd);
+            String tmp =";"+ DefaultHeaders.JSESSIONID_NAME+"=";
+            int semicolon = uri.indexOf(tmp);
+            if(semicolon>=0){
+                sessionId = uri.substring(semicolon + tmp.length());
+                uri = uri.substring(0,semicolon);
+            }
+            int contextslash = uri.indexOf("/",1);
+            if(contextslash != -1){
+                this.docbase = uri.substring(1,contextslash);
+                uri = uri.substring(contextslash);
+            }
         }
-        int semicolon = uri.indexOf(tmp);
-        if(semicolon>=0){
-            sessionId = uri.substring(semicolon + tmp.length());
-            uri = uri.substring(0,semicolon);
-        }
+
     }
 
     private void parseConnection(Socket socket) {

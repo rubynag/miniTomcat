@@ -51,11 +51,11 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
         if (actualClass == null)
             throw new ServletException("servlet class not been specified");
 
-        ClassLoader classLoader = getLoader();
+        WebappClassLoader classLoader = getLoader();
         Class classClass = null;
         try{
             if(actualClass != null){
-                classClass = classLoader.loadClass(actualClass);
+                classClass = classLoader.getClassLoader().loadClass(actualClass);
             }
         } catch (ClassNotFoundException e) {
             throw new ServletException("Servlet class not found:"+actualClass);
@@ -95,7 +95,6 @@ public class StandardWrapper extends ContainerBase implements Wrapper {
     public String getInfo() {
         return "Minit Servlet Wrapper, version 0.1";
     }
-
 
     public void addChild(Container child) {}
 

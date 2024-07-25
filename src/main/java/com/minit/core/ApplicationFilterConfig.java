@@ -69,13 +69,13 @@ public class ApplicationFilterConfig implements FilterConfig {
         if(this.filter != null)
             return (this.filter);
         String filterClass = filterDef.getFilterClass();
-        ClassLoader classLoader = null;
+        WebappClassLoader classLoader = null;
         classLoader = context.getLoader();
 
         //获取当前线程的上下文类加载器
         ClassLoader oldCtxClassLoder = Thread.currentThread().getContextClassLoader();
 
-        Class clazz = classLoader.loadClass(filterClass);
+        Class clazz = classLoader.getClassLoader().loadClass(filterClass);
         this.filter = (Filter)clazz.newInstance();
         filter.init(this);
         return this.filter;

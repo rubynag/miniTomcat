@@ -1,5 +1,6 @@
 package com.minit.connector.http;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -62,6 +63,13 @@ public class HttpProcessor implements Runnable{
                 response.sendHeaders();
                 // check if this is a request for a servlet or a static resource
                 // a request for a servlet begins with "/servlet/"
+
+                try{
+                    response.sendHeaders();
+                }catch (IOException exception){
+                    exception.printStackTrace();
+                }
+
                 if (request.getUri().startsWith("/servlet/")) {
                     ServletProcessor processor = new ServletProcessor(this.connector);
                     processor.process(request, response);
