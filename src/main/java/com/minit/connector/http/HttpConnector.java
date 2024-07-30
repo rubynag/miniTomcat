@@ -3,6 +3,7 @@ package com.minit.connector.http;
 import com.minit.*;
 import com.minit.core.StandardContext;
 import com.minit.session.StandardSession;
+import com.minit.startup.Bootstrap;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -16,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HttpConnector implements Connector, Runnable {
 
     private String info = "com.minit.connector.http.HttpConnector/0.1";
-    private int port = 8080;
     int minProcessors = 3;
     int maxProcessors = 10;
     int curProcessors = 0;
@@ -31,7 +31,7 @@ public class HttpConnector implements Connector, Runnable {
         ServerSocket serverSocket = null;
         int port = 8080;
         try {
-            serverSocket = new ServerSocket(port, 1, InetAddress.getByName("127.0.0.1"));
+            serverSocket = new ServerSocket(Bootstrap.PORT, 1, InetAddress.getByName("127.0.0.1"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -66,7 +66,7 @@ public class HttpConnector implements Connector, Runnable {
     }
 
     public void start() {
-        threadName = "HttpConnector[" + port + "]";
+        threadName = "HttpConnector[" + Bootstrap.PORT + "]";
         log("httpConnector.starting " + threadName);
         Thread thread = new Thread(this);
         thread.start();

@@ -1,9 +1,6 @@
 package com.minit.core;
 
-import com.minit.ContainerEvent;
-import com.minit.ContainerListener;
-import com.minit.Request;
-import com.minit.Response;
+import com.minit.*;
 import com.minit.connector.http.HttpConnector;
 
 import javax.servlet.ServletException;
@@ -51,7 +48,7 @@ public class StandardHost extends ContainerBase{
             context = new StandardContext();
             context.setDocBase(name);
             context.setConnector(connector);
-            WebappClassLoader classLoader = new WebappClassLoader();
+            Loader classLoader = new WebappLoader(name,this.loader.getClassLoader());
             context.setLoader(classLoader);
             classLoader.start();
 
@@ -105,7 +102,7 @@ public class StandardHost extends ContainerBase{
                 try {
                     // Identify the class loader we will be using
                     String listenerClass = def.getListenerClass();
-                    WebappClassLoader classLoader = null;
+                    Loader classLoader = null;
                     classLoader = this.getLoader();
 
                     ClassLoader oldCtxClassLoader =

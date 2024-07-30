@@ -1,42 +1,39 @@
 package com.minit.core;
 
-import com.minit.Container;
-
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
 
-public class WebappClassLoader extends URLClassLoader{
+public class CommonClassLoader extends URLClassLoader {
 
     protected boolean delegate = false;
     private ClassLoader parent = null;
     private ClassLoader system = null;
-    public WebappClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, parent);
-        this.parent = parent;
-        system = getSystemClassLoader();
-    }
 
-    public WebappClassLoader() {
+    public CommonClassLoader(){
         super(new URL[0]);
         this.parent = getParent();
         system = getSystemClassLoader();
     }
-    public WebappClassLoader(URL[] urls) {
+
+    public CommonClassLoader(URL[] urls){
         super(urls);
         this.parent = getParent();
         system = getSystemClassLoader();
     }
-    public WebappClassLoader(ClassLoader parent) {
+
+    public CommonClassLoader(ClassLoader parent) {
         super(new URL[0], parent);
         this.parent = parent;
         system = getSystemClassLoader();
     }
 
+    public CommonClassLoader(URL[] urls, ClassLoader parent) {
+        super(urls, parent);
+        this.parent = parent;
+        system = getSystemClassLoader();
+    }
     public boolean getDelegate() {
-        return this.delegate;
+        return (this.delegate);
     }
     public void setDelegate(boolean delegate) {
         this.delegate = delegate;
@@ -47,57 +44,63 @@ public class WebappClassLoader extends URLClassLoader{
         try {
             clazz = super.findClass(name);
         } catch (RuntimeException e) {
-            throw (e);
+            throw e;
         }
-        if (clazz == null) {
+        if(clazz == null){
             throw new ClassNotFoundException(name);
         }
-        // Return the class we have located
-        return (clazz);
+        return clazz;
     }
 
     public Class loadClass(String name) throws ClassNotFoundException {
         return (loadClass(name, false));
     }
-    public Class<?> loadClass(String name, boolean resolve)
-            throws ClassNotFoundException {
+
+    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> clazz = null;
-        try {
+        try{
             clazz = system.loadClass(name);
-            if (clazz != null) {
-                if (resolve)
+            if(clazz != null){
+                if(resolve)
                     resolveClass(clazz);
-                return (clazz);
+                return clazz;
             }
         } catch (ClassNotFoundException e) {
+        //Ignore
         }
         boolean delegateLoad = delegate;
-        if (delegateLoad) {
+
+        // (1) Delegate to our parent if requested
+        if(delegateLoad){
             ClassLoader loader = parent;
-            if (loader == null)
+            if(loader == null){
                 loader = system;
-            try {
+            }
+            try{
                 clazz = loader.loadClass(name);
-                if (clazz != null) {
-                    if (resolve)
+                if(clazz != null){
+                    if(resolve)
                         resolveClass(clazz);
-                    return (clazz);
+                    return clazz;
                 }
             } catch (ClassNotFoundException e) {
                 ;
             }
         }
-        try {
+
+        // (2) Search local repositories
+        try{
             clazz = findClass(name);
-            if (clazz != null) {
-                if (resolve)
+            if(clazz != null){
+                if(resolve)
                     resolveClass(clazz);
-                return (clazz);
+                return clazz;
             }
         } catch (ClassNotFoundException e) {
-            ;
+        ;
         }
 
+        // (3) Delegate to parent unconditionally
         if (!delegateLoad) {
             ClassLoader loader = parent;
             if (loader == null)
@@ -113,17 +116,18 @@ public class WebappClassLoader extends URLClassLoader{
                 ;
             }
         }
+
+        // This class was not found
         throw new ClassNotFoundException(name);
-
     }
 
-
-    private void log(String message) {
-        System.out.println("WebappClassLoader: " + message);
+    private void log(String msg){
+        System.out.println("WebappClassLoader:" +msg);
     }
-    private void log(String message, Throwable throwable) {
-        System.out.println("WebappClassLoader: " + message);
+
+    private void log(String msg,Throwable throwable){
+        System.out.println("WebappClassLoader:" +msg);
         throwable.printStackTrace(System.out);
     }
-
 }
+

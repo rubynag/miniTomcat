@@ -11,7 +11,7 @@ public abstract class ContainerBase implements Container , Pipeline {
 
     protected Map<String, Container> children = new ConcurrentHashMap<>();
 
-    protected WebappClassLoader loader = null;
+    protected Loader loader = null;
 
     protected String name = null;
     protected Container parent = null;
@@ -89,7 +89,7 @@ public abstract class ContainerBase implements Container , Pipeline {
 
     public abstract String getInfo();
 
-    public WebappClassLoader getLoader() {
+    public Loader getLoader() {
         if (loader != null)
             return (loader);
         if (parent != null)
@@ -97,11 +97,11 @@ public abstract class ContainerBase implements Container , Pipeline {
         return (null);
     }
 
-    public synchronized void setLoader(WebappClassLoader loader) {
+    public synchronized void setLoader(Loader loader) {
         loader.setPath(path);
         loader.setDocbase(docbase);
         loader.setContainer(this);
-        WebappClassLoader olderLoader = this.loader;
+        Loader olderLoader = this.loader;
         if(olderLoader == loader )
             return;
         this.loader = loader;

@@ -295,7 +295,7 @@ public class StandardContext extends ContainerBase implements Context {
                 ContainerListener listener = null;
                 try {
                     String listenerClass = listenerDef.getListenerClass();
-                    WebappClassLoader classLoader = null;
+                    Loader classLoader = null;
                     classLoader = this.getLoader();
 
                     ClassLoader oldCtxClassLoader =

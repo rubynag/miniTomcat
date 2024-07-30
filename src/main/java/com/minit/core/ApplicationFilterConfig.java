@@ -1,6 +1,7 @@
 package com.minit.core;
 
 import com.minit.Context;
+import com.minit.Loader;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -69,7 +70,7 @@ public class ApplicationFilterConfig implements FilterConfig {
         if(this.filter != null)
             return (this.filter);
         String filterClass = filterDef.getFilterClass();
-        WebappClassLoader classLoader = null;
+        Loader classLoader = null;
         classLoader = context.getLoader();
 
         //获取当前线程的上下文类加载器
