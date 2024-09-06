@@ -11,7 +11,7 @@ public class FileLogger extends LoggerBase {
 
     private String date = "";
 
-    private String directory = "";
+    private String directory = "logs";
     protected static final String info = "com.minit.logger.FileLogger/1.0";
 
     private String prefix = "minit.";

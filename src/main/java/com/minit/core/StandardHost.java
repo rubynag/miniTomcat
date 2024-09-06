@@ -2,8 +2,10 @@ package com.minit.core;
 
 import com.minit.*;
 import com.minit.connector.http.HttpConnector;
+import com.minit.logger.FileLogger;
 
 import javax.servlet.ServletException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,12 +47,14 @@ public class StandardHost extends ContainerBase{
     public StandardContext getContext(String name){
         StandardContext context = contextMap.get(name);
         if(context == null){
+            System.out.println("loading context"+name);
             context = new StandardContext();
             context.setDocBase(name);
             context.setConnector(connector);
             Loader classLoader = new WebappLoader(name,this.loader.getClassLoader());
             context.setLoader(classLoader);
             classLoader.start();
+            context.start();
 
             this.contextMap.put(name, context);
         }
@@ -58,7 +62,23 @@ public class StandardHost extends ContainerBase{
     }
 
     public void start(){
+        fireContainerEvent("Host Started",this);
 
+        Logger logger = new FileLogger();
+        setLogger(logger);
+
+        ContainerListenerDef listenerDef = new ContainerListenerDef();
+        listenerDef.setListenerName("TestListener");
+        listenerDef.setListenerClass("test.TestListener");
+        addListenerDef(listenerDef);
+        listenerStart();
+
+        //load all context under /webapps directory
+        File classPath = new File(System.getProperty("minit.base"));
+        String dirs[] = classPath.list();
+        for (int i=0; i < dirs.length; i++) {
+            getContext(dirs[i]);
+        }
     }
 
     public void addContainerListener(ContainerListener listener) {
